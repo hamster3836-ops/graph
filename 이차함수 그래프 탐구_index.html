@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이차함수 그래프 탐구실</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --secondary: #06b6d4;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --accent: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 컨트롤 영역 */
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .control-label span:last-child {
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* 함수식 및 정보 박스 */
+        .info-box {
+            background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .formula-display {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #312e81;
+            margin-bottom: 8px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #4338ca;
+            font-weight: 500;
+        }
+
+        .property-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        /* Canvas 영역 */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 미션 영역 */
+        .mission-card {
+            border-left: 4px solid var(--secondary);
+        }
+
+        .mission-item {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .mission-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            line-height: 1.4;
+        }
+
+        .mission-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            resize: vertical;
+            min-height: 45px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .mission-input:focus {
+            border-color: var(--primary);
+        }
+
+        .mission-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-toggle-hint {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 2px 0;
+        }
+
+        .btn-toggle-hint:hover {
+            text-decoration: underline;
+        }
+
+        .solution-box {
+            display: none;
+            margin-top: 8px;
+            padding: 10px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #065f46;
+            line-height: 1.5;
+        }
+
+        .solution-box.show {
+            display: block;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📈 이차함수 그래프 탐구실</h1>
+        <p>슬라이더를 조작하여 계수 a, b, c가 이차함수 그래프에 미치는 영향을 직접 관찰해 보세요.</p>
+    </header>
+
+    <div class="main-layout">
+        <!-- 왼쪽 패널: 조작 및 시각화 -->
+        <div>
+            <div class="card">
+                <h2>🎛️ 계수 조작 패널</h2>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>이차항 계수 (a) — 폭과 방향</span>
+                        <span id="val-a">1.0</span>
+                    </div>
+                    <input type="range" id="range-a" min="-5" max="5" step="0.1" value="1">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>일차항 계수 (b) — 대칭축 위치 연동</span>
+                        <span id="val-b">0.0</span>
+                    </div>
+                    <input type="range" id="range-b" min="-10" max="10" step="0.5" value="0">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>상수항 (c) — y절편 (상하 이동)</span>
+                        <span id="val-c">0.0</span>
+                    </div>
+                    <input type="range" id="range-c" min="-10" max="10" step="0.5" value="0">
+                </div>
+
+                <div class="info-box">
+                    <div class="formula-display" id="formula-text">y = 1.0x<sup>2</sup> + 0.0x + 0.0</div>
+                    <div class="properties-grid">
+                        <div class="property-item" id="vertex-text">꼭짓점: (0.00, 0.00)</div>
+                        <div class="property-item" id="axis-text">대칭축: x = 0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 좌표평면 그래프</h2>
+                <div class="canvas-container">
+                    <canvas id="graphCanvas" width="500" height="500"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 패널: 관찰 미션 및 답변/해설 -->
+        <div>
+            <div class="card mission-card">
+                <h2>🎯 관찰 미션 & 생각 노트</h2>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">
+                    그래프를 직접 조작해보고 아래 미션의 답을 나만의 언어로 적어본 뒤, 해설을 확인해 보세요!
+                </p>
+
+                <!-- 미션 1 -->
+                <div class="mission-item">
+                    <div class="mission-title">
+                        <span>Q1.</span>
+                        <span><b>a</b>의 부호(양수/음수)와 절댓값이 변할 때 그래프의 모양과 방향은 어떻게 달라지나요?</span>
+                    </div>
+                    <textarea class="mission-input" placeholder="여기에 내 생각을 자유롭게 적어보세요..."></textarea>
+                    <div class="mission-actions">
+                        <button class="btn-toggle-hint" onclick="toggleSolution(1)">💡 정답 및 해설 보기</button>
+                    </div>
+                    <div class="solution-box" id="solution-1">
+                        <div class="solution-title">모범 해설:</div>
+                        • <b>a > 0</b>이면 아래로 볼록하고, <b>a < 0</b>이면 위로 볼록합니다.<br>
+                        • <b>|a|</b>의 값이 커질수록 그래프의 폭이 좁아지고(가파르게), 작아질수록 폭이 넓어집니다.
+                    </div>
+                </div>
+
+                <!-- 미션 2 -->
+                <div class="mission-item">
+                    <div class="mission-title">
+                        <span>Q2.</span>
+                        <span>상수항 <b>c</b>의 값을 바꾸면 그래프는 좌표평면 위에서 어떻게 움직이나요? y절편과는 어떤 관계가 있나요?</span>
+                    </div>
+                    <textarea class="mission-input" placeholder="여기에 내 생각을 자유롭게 적어보세요..."></textarea>
+                    <div class="mission-actions">
+                        <button class="btn-toggle-hint" onclick="toggleSolution(2)">💡 정답 및 해설 보기</button>
+                    </div>
+                    <div class="solution-box" id="solution-2">
+                        <div class="solution-title">모범 해설:</div>
+                        • <b>c</b>의 값은 그래프를 위아래(수직 방향)로 평행이동시킵니다.<br>
+                        • <b>x = 0</b>일 때 <b>y = c</b>이므로, <b>c</b>는 그래프가 y축과 만나는 점(y절편)의 위치를 직접 결정합니다.
+                    </div>
+                </div>
+
+                <!-- 미션 3 -->
+                <div class="mission-item">
+                    <div class="mission-title">
+                        <span>Q3.</span>
+                        <span><b>a</b>와 <b>b</b>의 값을 동시에 바꿀 때, 꼭짓점의 x좌표(대칭축 x = -b / 2a)는 어떻게 이동하나요?</span>
+                    </div>
+                    <textarea class="mission-input" placeholder="여기에 내 생각을 자유롭게 적어보세요..."></textarea>
+                    <div class="mission-actions">
+                        <button class="btn-toggle-hint" onclick="toggleSolution(3)">💡 정답 및 해설 보기</button>
+                    </div>
+                    <div class="solution-box" id="solution-3">
+                        <div class="solution-title">모범 해설:</div>
+                        • 대칭축은 단순히 <b>b</b>뿐만 아니라 <b>a</b>와 <b>b</b>의 비율에 의해 결정됩니다.<br>
+                        • <b>a</b>의 부호가 같을 때 <b>b</b>가 커지면 대칭축이 왼쪽으로, 작아지면 오른쪽으로 이동하는 경향을 관찰할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rangeA = document.getElementById('range-a');
+    const rangeB = document.getElementById('range-b');
+    const rangeC = document.getElementById('range-c');
+
+    const valA = document.getElementById('val-a');
+    const valB = document.getElementById('val-b');
+    const valC = document.getElementById('val-c');
+
+    const formulaText = document.getElementById('formula-text');
+    const vertexText = document.getElementById('vertex-text');
+    const axisText = document.getElementById('axis-text');
+
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function draw() {
+        const a = parseFloat(rangeA.value);
+        const b = parseFloat(rangeB.value);
+        const c = parseFloat(rangeC.value);
+
+        // UI 값 갱신
+        valA.textContent = a.toFixed(1);
+        valB.textContent = b.toFixed(1);
+        valC.textContent = c.toFixed(1);
+
+        // 함수식 HTML 갱신 (상첨자 적용)
+        let bStr = b >= 0 ? `+ ${b.toFixed(1)}x` : `- ${Math.abs(b).toFixed(1)}x`;
+        let cStr = c >= 0 ? `+ ${c.toFixed(1)}` : `- ${Math.abs(c).toFixed(1)}`;
+        formulaText.innerHTML = `y = ${a.toFixed(1)}x<sup>2</sup> ${bStr} ${cStr}`;
+
+        // 꼭짓점 및 대칭축 계산
+        let vx = 0;
+        let vy = c;
+        if (a !== 0) {
+            vx = -b / (2 * a);
+            vy = a * vx * vx + b * vx + c;
+        }
+        vertexText.textContent = `꼭짓점: (${vx.toFixed(2)}, ${vy.toFixed(2)})`;
+        axisText.textContent = `대칭축: x = ${vx.toFixed(2)}`;
+
+        // Canvas 렌더링 설정
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+
+        const xMin = -10, xMax = 10;
+        const yMin = -10, yMax = 10;
+
+        function toScreenX(x) {
+            return ((x - xMin) / (xMax - xMin)) * width;
+        }
+
+        function toScreenY(y) {
+            return height - ((y - yMin) / (yMax - yMin)) * height;
+        }
+
+        // 1. 그리드 및 눈금 그리기
+        ctx.strokeStyle = '#f1f5f9';
+        ctx.lineWidth = 1;
+
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+            ctx.beginPath();
+            ctx.moveTo(toScreenX(x), 0);
+            ctx.lineTo(toScreenX(x), height);
+            ctx.stroke();
+        }
+
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, toScreenY(y));
+            ctx.lineTo(width, toScreenY(y));
+            ctx.stroke();
+        }
+
+        // 2. X, Y 축 그리기
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(toScreenX(0), 0);
+        ctx.lineTo(toScreenX(0), height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, toScreenY(0));
+        ctx.lineTo(width, toScreenY(0));
+        ctx.stroke();
+
+        // 3. 대칭축 점선 표시
+        if (a !== 0) {
+            ctx.strokeStyle = '#9333ea';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(toScreenX(vx), 0);
+            ctx.lineTo(toScreenX(vx), height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // 4. 이차함수 그래프 곡선 그리기
+        ctx.strokeStyle = '#4f46e5';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+
+        let isFirst = true;
+        for (let px = 0; px <= width; px += 2) {
+            let x = xMin + (px / width) * (xMax - xMin);
+            let y = a * x * x + b * x + c;
+            let py = toScreenY(y);
+
+            if (isFirst) {
+                ctx.moveTo(px, py);
+                isFirst = false;
+            } else {
+                ctx.lineTo(px, py);
+            }
+        }
+        ctx.stroke();
+
+        // 5. 꼭짓점 강조 표시
+        if (a !== 0 && vx >= xMin && vx <= xMax && vy >= yMin && vy <= yMax) {
+            let sx = toScreenX(vx);
+            let sy = toScreenY(vy);
+
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    }
+
+    // 미션 해설 토글 함수
+    function toggleSolution(missionNum) {
+        const solutionBox = document.getElementById(`solution-${missionNum}`);
+        solutionBox.classList.toggle('show');
+    }
+
+    rangeA.addEventListener('input', draw);
+    rangeB.addEventListener('input', draw);
+    rangeC.addEventListener('input', draw);
+
+    draw();
+</script>
+
+</body>
+</html>
